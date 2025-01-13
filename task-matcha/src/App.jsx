@@ -14,11 +14,11 @@ function App() {
 
     if (editIndex !== null) {
       const updatedTasks = [...tasks];
-      updatedTasks[editIndex] = newTask.trim();
+      updatedTasks[editIndex] = { task: newTask.trim(), completed: tasks[editIndex].completed };
       setTasks(updatedTasks);
       setEditIndex(null);
     } else {
-      setTasks([...tasks, newTask.trim()]);
+      setTasks([...tasks, { task: newTask.trim(), completed: false }]);
     }
 
     setNewTask("");
@@ -26,18 +26,24 @@ function App() {
 
   const handleEditTask = (index) => {
     setEditIndex(index);
-    setNewTask(tasks[index]);
+    setNewTask(tasks[index].task);
+  };
+
+  const handleToggleCompleted = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks[index].completed = !updatedTasks[index].completed;
+    setTasks(updatedTasks);
   };
 
   const handleDeleteTask = (taskToDelete) => {
-    setTasks(tasks.filter((task) => task !== taskToDelete));
+    setTasks(tasks.filter((task) => task.task !== taskToDelete.task));
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-transparent py-8 px-4 font-mono">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl">
         <h1 className="text-2xl font-mono font-semibold text-center text-[#76885B] mb-6">
-          🍵 Task Matcha
+          Task Matcha
         </h1>
         <form onSubmit={handleAddOrEditTask} className="mb-6">
           <div className="flex items-center gap-3">
@@ -60,7 +66,6 @@ function App() {
               <IoAddCircle />
             </button>
 
-
           </div>
         </form>
         <ul className="divide-y divide-gray-200">
@@ -72,7 +77,18 @@ function App() {
                 key={index}
                 className="flex items-center text-start py-4 px-2 text-[#76885B] border rounded-md mb-2"
               >
-                <span className="flex-grow">{task}</span>
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => handleToggleCompleted(index)}
+                  className="mr-2"
+                  aria-label="Toggle completed"
+                />
+                <span
+                  className={`flex-grow ${task.completed ? "line-through" : ""}`}
+                >
+                  {task.task}
+                </span>
                 <button
                   type="button"
                   onClick={() => handleEditTask(index)}
